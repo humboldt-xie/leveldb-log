@@ -49,7 +49,7 @@ void PrintLog(Env * env,string fname){
    SequentialFile* file;
    Status ok=env->NewSequentialFile(fname, &file);
    printf("%s\n",ok.ToString().c_str());
-   if(!file){
+   if(!ok.Ok()){
      return;
    }
    log::Reader *reader=new log::Reader(file, 
