@@ -124,7 +124,8 @@ class LogIterator {
  public:
   std::vector<std::string> filenames;
   std::string curlog_;
-  int64_t     number_;
+  int     number_;
+  int     last_number_;
   Env *env;
   SequenceNumber cur_seq_;
   SequenceNumber last_seq_;
@@ -144,6 +145,7 @@ class LogIterator {
     lost_=0;
     offset=0;
     curlog_="";
+    last_number_=0;
   }
   void UpdateFilelist(){
     std::vector<std::string> filenames;
@@ -156,6 +158,9 @@ class LogIterator {
       if (ParseFileName(filenames[i], &number, &type)) {
         if(type==kLogFile){
           this->filenames.push_back(filenames[i]);
+          if(number>last_number_){
+            last_number_=number;
+          }
         }
       }
     }
@@ -227,10 +232,12 @@ class LogIterator {
 
   }
   bool PrepareReader() {
+    int64_t last_number=last_number_;
     UpdateFilelist();
     if(curlog_=="" || isEof){
       if(file_){
-        if(file_->HasChange()){
+        //no next logs
+        if(number_>=last_number){
           Reset();
           isEof=false;
           return false;
@@ -365,8 +372,8 @@ void *thread(void *ptr) {
       }
       index++;
     }
-    printf("end write:%d\n",index);
-    sleep(2);
+    //printf("end write:%d\n",index);
+    sleep(1);
   }
 
 }
@@ -392,8 +399,8 @@ int main()
         sleep(1);
       }
     }
-    printf("-last record %s %lld %lld eof:%d\n",iter.curlog_.c_str(),iter.offset,iter.last_seq_,iter.isEof);
-    sleep(1);
+    //printf("-last record %s %lld %lld eof:%d\n",iter.curlog_.c_str(),iter.offset,iter.last_seq_,iter.isEof);
+    sleep(2);
   }
 
 
