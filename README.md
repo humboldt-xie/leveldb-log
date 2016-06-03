@@ -15,9 +15,9 @@ Status ok=env->NewSequentialFile(fname, &file);
 
 ```cpp
 log::Reader *reader=new log::Reader(file, 
-																	 NULL, 
-																	 true/*checksum*/,
-																	 initial_offset/*initial_offset*/);
+                                    NULL, 
+                                    true/*checksum*/,
+                                    initial_offset/*initial_offset*/);
 while (reader->ReadRecord(&record, &scratch)){
 
 }
